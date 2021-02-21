@@ -79,19 +79,13 @@ Resources:
           !Ref ApiPathContact
           ]
         ]
-  ContactFormRootResource:
+  ContactRootContactResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId: !Ref ContactFormAPI
       ParentId: !GetAtt 
         - ContactFormAPI
         - RootResourceId
-      PathPart: ''
-  ContactRootContactResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref ContactFormAPI
-      ParentId: !Ref ContactFormRootResource
       PathPart: !Ref ApiPathContact
   ApiDeployment20201229110003:
     DependsOn: ContactPOSTMethod
