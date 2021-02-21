@@ -24,4 +24,4 @@ jobs:
       - sam validate
       - sam build --debug
       - sam package --s3-bucket bransonsolutions-codedeploy --output-template-file out.yaml --region us-east-1
-      - sam deploy --template-file out.yaml --stack-name BransonSolutions-LMS-DatabaseWriter --region us-east-1 --no-fail-on-empty-changeset  --capabilities CAPABILITY_NAMED_IAM  
+      - sam deploy --template-file out.yaml --stack-name ContactFormSES --region us-east-1 --no-fail-on-empty-changeset  --capabilities CAPABILITY_NAMED_IAM  
