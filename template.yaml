@@ -145,7 +145,7 @@ Resources:
                   - "ses:SendRawEmail"
                 # arn:aws:ses:us-east-1:375251325318:identity/marwan.nakhaleh@branson.solutions
                 Resource: 
-                  !Join:
+                  !Join
                     - ""
                     - - "arn:aws:ses:"
                       - !Ref AWS::Region
