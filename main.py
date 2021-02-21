@@ -12,11 +12,6 @@ def lambda_handler(event, context):
     # is still in the sandbox, this address must be verified.
     RECIPIENT = os.environ["RECIPIENT_EMAIL"]
 
-    # Specify a configuration set. If you do not want to use a configuration
-    # set, comment the following variable, and the 
-    # ConfigurationSetName=CONFIGURATION_SET argument below.
-    CONFIGURATION_SET = "ConfigSet"
-
     # If necessary, replace us-west-2 with the AWS Region you're using for Amazon SES.
     AWS_REGION = boto3.session.Session().region_name
 
@@ -54,9 +49,6 @@ def lambda_handler(event, context):
                 },
             },
             Source=SENDER,
-            # If you are not using a configuration set, comment or delete the
-            # following line
-            ConfigurationSetName=CONFIGURATION_SET,
         )
     # Display an error if something goes wrong.	
     except ClientError as e:
