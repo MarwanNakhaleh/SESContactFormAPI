@@ -6,6 +6,7 @@ Parameters:
     Type: String
     Description: the environment in which this code is running
     MinLength: '0'
+    Default: marwan.nakhaleh@branson.solutions
   ApiPathContact:
     Type: String
     Default: contact
@@ -97,7 +98,7 @@ Resources:
     Type: AWS::ApiGateway::Deployment
     Properties: 
       Description: deployment of courses endpoints
-      RestApiId: !ImportValue BransonSolutionsLMSAPI
+      RestApiId: !Ref ContactFormAPI
       StageName: !Ref StageName
   ContactPOSTMethod:
     DependsOn: LambdaPOSTPermission
