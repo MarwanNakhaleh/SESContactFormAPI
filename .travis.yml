@@ -1,0 +1,27 @@
+language: python
+python:
+  - "3.8"
+before_install:
+  - python -m pip install --upgrade pip
+install:
+  - pip install -r requirements.txt
+  - pip install awscli
+  - pip install aws-sam-cli
+  - pip install cfn-lint
+jobs:
+  include:
+  # - stage: test
+  #   script:
+  #   - pytest
+  - stage: deploy
+    provider: script
+    script:
+      # - rm -rf test/
+      - aws configure set aws_access_key_id $AWS_ACCESS_KEY
+      - aws configure set aws_secret_access_key $AWS_SECRET_KEY
+      - aws configure set default.region us-east-1
+      - cfn-lint serverless.yaml
+      - sam validate
+      - sam build --debug
+      - sam package --s3-bucket bransonsolutions-codedeploy --output-template-file out.yaml --region us-east-1
+      - sam deploy --template-file out.yaml --stack-name BransonSolutions-LMS-DatabaseWriter --region us-east-1 --no-fail-on-empty-changeset  --capabilities CAPABILITY_NAMED_IAM  

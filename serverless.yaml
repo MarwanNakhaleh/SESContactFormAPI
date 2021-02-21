@@ -1,0 +1,177 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  RecipientEmail:
+    Type: String
+    Description: the environment in which this code is running
+    MinLength: '0'
+  ApiPathContact:
+    Type: String
+    Default: contact
+  StageName:
+    Type: String
+    Default: live
+
+Resources:
+  ContactFormAPI:
+    Type: AWS::Serverless::Api
+    Description: API for sending contact emails
+    Properties:
+      BinaryMediaTypes: 
+        - "application/json"
+      Cors:
+        AllowMethods: "'POST'"
+        AllowHeaders: "'X-Forwarded-For'"
+        AllowOrigin: "'*'" # TODO: lock this down
+        MaxAge: "'600'"
+        AllowCredentials: False
+      # TODO: Add OpenAPI definition files 
+      # DefinitionBody: String
+      # DefinitionUri: String | ApiDefinition
+      EndpointConfiguration: 
+        Type: EDGE
+      Models:
+        ContactFormInformation:
+          type: object
+          required:
+            - email_address
+            - subject
+            - body
+          properties:
+            email_address:
+              type: string
+            subject:
+              type: string
+            integer:
+              type: string
+      Name: ContactFormAPI
+      OpenApiVersion: "3.0.1"
+      StageName: !Ref StageName
+      Tags: 
+        ApplicationName: ContactForm 
+      TracingEnabled: False
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      ParentId: !GetAtt 
+        - ContactFormAPI
+        - RootResourceId
+      PathPart: v1
+  LambdaPOSTPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      FunctionName: !GetAtt ContactFormLambda.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        !Join ["", [
+          "arn:aws:execute-api:", 
+          !Ref "AWS::Region", 
+          ":", 
+          !Ref "AWS::AccountId",
+          ":",
+          !ImportValue ContactFormAPI,
+          "/*/POST/v1/",
+          !Ref ApiPathContact
+          ]
+        ]
+  ContactFormRootResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      ParentId: !GetAtt 
+        - ContactFormAPI
+        - RootResourceId
+      PathPart: ''
+  ContactRootContactResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      ParentId: !Ref ContactFormRootResource
+      PathPart: !Ref ApiPathContact
+  ApiDeployment20201229110003:
+    DependsOn: ContactPOSTMethod
+    Type: AWS::ApiGateway::Deployment
+    Properties: 
+      Description: deployment of courses endpoints
+      RestApiId: !ImportValue BransonSolutionsLMSAPI
+      StageName: !Ref StageName
+  ContactPOSTMethod:
+    DependsOn: LambdaPOSTPermission
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ResourceId: !Ref ContactRootContactResource
+      RestApiId: !Ref ContactFormAPI
+      AuthorizationType: NONE
+      HttpMethod: POST
+      ApiKeyRequired: false
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Join ["", [
+          "arn:aws:apigateway:",
+          !Ref "AWS::Region",
+          ":lambda:path/2015-03-31/functions/",
+          !GetAtt ContactFormLambda.Arn,
+          "/invocations"
+        ]]
+  ContactFormLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ContactFormLambdaRole
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+                - "apigateway.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      # commenting out for now to see what resource SES tries to send on, so I don't have to just do * if I can help it
+
+      # Policies:
+      #   - PolicyName: ses_send_email
+      #     PolicyDocument: 
+      #       Version: "2012-10-17"
+      #       Statement:
+      #         - Effect: Allow
+      #           Action:
+      #             - "ses:SendEmail"
+      #             - "ses:SendRawEmail"
+      #           Resource: "*"
+
+  ContactFormLambda:
+    Type: AWS::Serverless::Function
+    Description: description
+    Properties:
+      Handler: main.lambda_handler
+      Runtime: python3.8
+      CodeUri: .
+      Timeout: 30
+      FunctionName: ContactFormFunction
+      MemorySize: 128
+      Role: !GetAtt ContactFormLambdaRole.Arn
+      Environment:
+        Variables:
+          RECIPIENT_EMAIL: !Ref RecipientEmail
+      Events:
+        ContactEvent:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: "/contact"
+            # RequestModel: RequestModel
+            # RequestParameters: String | RequestParameter
+            RestApiId: !Ref ContactFormAPI
+      Tags:
+        ApplicationName: ContactForm
+
+
