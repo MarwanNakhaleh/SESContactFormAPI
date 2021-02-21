@@ -1,11 +1,12 @@
 import os
 import json
+from base64 import b64decode
 
 import boto3
 from botocore.exceptions import ClientError
 
 def lambda_handler(event, context):
-    print("this is the event: " + json.dumps(event))
+    event_body = json.loads(b64decode(event["body"]))
     # Replace sender@example.com with your "From" address.
     # This address must be verified with Amazon SES.
     SENDER = os.environ["RECIPIENT_EMAIL"]
@@ -18,10 +19,10 @@ def lambda_handler(event, context):
     AWS_REGION = boto3.session.Session().region_name
 
     # The subject line for the email.
-    SUBJECT = event["subject"]
+    SUBJECT = event_body["subject"]
 
     # The email body for recipients with non-HTML email clients.
-    BODY_TEXT = event["body"]    
+    BODY_TEXT = event_body["body"]    
 
     # The character encoding for the email.
     CHARSET = "UTF-8"
@@ -47,7 +48,7 @@ def lambda_handler(event, context):
                 },
                 'Subject': {
                     'Charset': CHARSET,
-                    'Data': event["email_address"] + ": " + SUBJECT,
+                    'Data': event_body["email_address"] + ": " + SUBJECT,
                 },
             },
             Source=SENDER,
@@ -55,6 +56,22 @@ def lambda_handler(event, context):
     # Display an error if something goes wrong.	
     except ClientError as e:
         print(e.response['Error']['Message'])
+        {
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            "statusCode": 500,
+            "body": e.response['Error']['Message'],
+        }
     else:
         print("Email sent! Message ID:"),
         print(response['MessageId'])
+        return {
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            "statusCode": 200,
+            "body": response["MessageId"],
+        }
