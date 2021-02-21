@@ -20,7 +20,7 @@ jobs:
       - aws configure set aws_access_key_id $AWS_ACCESS_KEY
       - aws configure set aws_secret_access_key $AWS_SECRET_KEY
       - aws configure set default.region us-east-1
-      - cfn-lint serverless.yaml
+      - cfn-lint template.yaml
       - sam validate
       - sam build --debug
       - sam package --s3-bucket bransonsolutions-codedeploy --output-template-file out.yaml --region us-east-1
