@@ -1,0 +1,2 @@
+# AWS SES Contact Form API
+This is just a lambda function with a CFT defining its configuration and an Serverless API (not to be confused with an API Gateway API, even though they're built on the same thing, or at least they should be)
