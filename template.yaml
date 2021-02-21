@@ -151,7 +151,8 @@ Resources:
                       - !Ref AWS::Region
                       - ":"
                       - !Ref AWS::AccountId
-                      - ":identity/*"
+                      - ":identity/"
+                      - !Ref RecipientEmail
 
   ContactFormLambda:
     Type: AWS::Serverless::Function
