@@ -74,7 +74,7 @@ Resources:
           ":", 
           !Ref "AWS::AccountId",
           ":",
-          !ImportValue ContactFormAPI,
+          !Ref ContactFormAPI,
           "/*/POST/v1/",
           !Ref ApiPathContact
           ]
