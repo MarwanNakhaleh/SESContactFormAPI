@@ -1,9 +1,11 @@
 import os
+import json
 
 import boto3
 from botocore.exceptions import ClientError
 
 def lambda_handler(event, context):
+    print("this is the event: " + json.dumps(event))
     # Replace sender@example.com with your "From" address.
     # This address must be verified with Amazon SES.
     SENDER = os.environ["RECIPIENT_EMAIL"]
