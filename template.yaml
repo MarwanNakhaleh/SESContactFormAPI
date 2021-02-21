@@ -67,6 +67,12 @@ Resources:
       RestApiId: !Ref ContactFormAPI
       ParentId: !Ref ApiResource
       PathPart: v1
+  ContactRootContactResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      ParentId: !Ref V1Resource
+      PathPart: !Ref ApiPathContact
   LambdaPOSTPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -81,16 +87,10 @@ Resources:
           !Ref "AWS::AccountId",
           ":",
           !Ref ContactFormAPI,
-          "/*/POST/v1/",
+          "/*/POST/api/v1/",
           !Ref ApiPathContact
           ]
         ]
-  ContactRootContactResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref ContactFormAPI
-      ParentId: !Ref V1Resource
-      PathPart: !Ref ApiPathContact
   ApiDeployment20201229110003:
     DependsOn: ContactPOSTMethod
     Type: AWS::ApiGateway::Deployment
