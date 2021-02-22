@@ -24,7 +24,7 @@ Resources:
       Cors:
         AllowMethods: "'POST'"
         AllowHeaders: "'X-Forwarded-For'"
-        AllowOrigin: "'https://localhost:8080/index.html'" # TODO: lock this down
+        AllowOrigin: "'*'" # TODO: lock this down
         MaxAge: "'600'"
         AllowCredentials: False
       # TODO: Add OpenAPI definition files 
