@@ -6,6 +6,8 @@ import boto3
 from botocore.exceptions import ClientError
 
 def lambda_handler(event, context):
+    print("this is the event: " + json.dumps(event))
+    print("this is the encoded event body: " + event["body"])
     event_body = json.loads(b64decode(event["body"]))
     # Replace sender@example.com with your "From" address.
     # This address must be verified with Amazon SES.
@@ -58,8 +60,8 @@ def lambda_handler(event, context):
         print(e.response['Error']['Message'])
         {
             "headers": {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*"
+                "Access-Control-Allow-Origin": "*",
+                'Access-Control-Allow-Methods': '*'
             },
             "statusCode": 500,
             "body": e.response['Error']['Message'],
@@ -69,8 +71,8 @@ def lambda_handler(event, context):
         print(response['MessageId'])
         return {
             "headers": {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*"
+                "Access-Control-Allow-Origin": "*",
+                'Access-Control-Allow-Methods': '*'
             },
             "statusCode": 200,
             "body": response["MessageId"],

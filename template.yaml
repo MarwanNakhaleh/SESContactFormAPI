@@ -14,6 +14,11 @@ Parameters:
     Type: String
     Default: live
 
+Globals:
+  Api:
+    EndpointConfiguration: EDGE
+    Cors: "'*'"
+
 Resources:
   ContactFormAPI:
     Type: AWS::Serverless::Api
@@ -143,7 +148,6 @@ Resources:
                 Action:
                   - "ses:SendEmail"
                   - "ses:SendRawEmail"
-                # arn:aws:ses:us-east-1:375251325318:identity/marwan.nakhaleh@branson.solutions
                 Resource: 
                   !Join
                     - ""
