@@ -5,75 +5,43 @@ from base64 import b64decode
 import boto3
 from botocore.exceptions import ClientError
 
-def lambda_handler(event, context):
-    print("this is the event: " + json.dumps(event))
-    print("this is the encoded event body: " + event["body"])
-    event_body = json.loads(b64decode(event["body"]))
-    # Replace sender@example.com with your "From" address.
-    # This address must be verified with Amazon SES.
-    SENDER = os.environ["RECIPIENT_EMAIL"]
+from SESClient import SESClient
 
-    # Replace recipient@example.com with a "To" address. If your account 
-    # is still in the sandbox, this address must be verified.
+def lambda_handler(event, context):
+    # print("this is the event: " + json.dumps(event))
+    # print("this is the encoded event body: " + event["body"])
+    event_body = json.loads(b64decode(event["body"]))
+    
     RECIPIENT = os.environ["RECIPIENT_EMAIL"]
 
-    # If necessary, replace us-west-2 with the AWS Region you're using for Amazon SES.
-    AWS_REGION = boto3.session.Session().region_name
-
-    # The subject line for the email.
-    SUBJECT = event_body["subject"]
-
-    # The email body for recipients with non-HTML email clients.
     BODY_TEXT = event_body["body"]    
 
-    # The character encoding for the email.
     CHARSET = "UTF-8"
 
-    # Create a new SES resource and specify a region.
-    client = boto3.client('ses',region_name=AWS_REGION)
+    client = SESClient()
 
-    # Try to send the email.
     try:
-        #Provide the contents of the email.
-        response = client.send_email(
-            Destination={
-                'ToAddresses': [
-                    RECIPIENT,
-                ],
-            },
-            Message={
-                'Body': {
-                    'Text': {
-                        'Charset': CHARSET,
-                        'Data': BODY_TEXT
-                    },
+        response = client.send_the_email(RECIPIENT, CHARSET, BODY_TEXT, event_body["email_address"], event_body["subject"])
+        if(response["MessageId"]):
+            print("Email sent!")
+            return {
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    'Access-Control-Allow-Methods': '*'
                 },
-                'Subject': {
-                    'Charset': CHARSET,
-                    'Data': event_body["email_address"] + ": " + SUBJECT,
+                "statusCode": 200,
+                "body": {
+                    "messageId": response["MessageId"]
                 },
-            },
-            Source=SENDER,
-        )
-    # Display an error if something goes wrong.	
-    except ClientError as e:
-        print(e.response['Error']['Message'])
+            }
+    # generic exception, though it might just be a KeyError
+    except Exception as e:
+        print(e)
         {
             "headers": {
                 "Access-Control-Allow-Origin": "*",
                 'Access-Control-Allow-Methods': '*'
             },
             "statusCode": 500,
-            "body": e.response['Error']['Message'],
-        }
-    else:
-        print("Email sent! Message ID:"),
-        print(response['MessageId'])
-        return {
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                'Access-Control-Allow-Methods': '*'
-            },
-            "statusCode": 200,
-            "body": response["MessageId"],
+            "body": e,
         }
