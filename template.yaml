@@ -66,18 +66,21 @@ Resources:
         - ContactFormAPI
         - RootResourceId
       PathPart: api
+
   V1Resource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId: !Ref ContactFormAPI
       ParentId: !Ref ApiResource
       PathPart: v1
+  
   ContactRootContactResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId: !Ref ContactFormAPI
       ParentId: !Ref V1Resource
       PathPart: !Ref ApiPathContact
+  
   LambdaPOSTPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -96,13 +99,27 @@ Resources:
           !Ref ApiPathContact
           ]
         ]
-  ApiDeployment20201229110003:
+  
+  ApiDeployment202103212021:
     DependsOn: ContactPOSTMethod
     Type: AWS::ApiGateway::Deployment
     Properties: 
       Description: deployment of courses endpoints
       RestApiId: !Ref ContactFormAPI
       StageName: !Ref StageName
+
+  ApiKey:
+    Type: 'AWS::ApiGateway::ApiKey'
+    DependsOn:
+      - ApiDeployment202103212021
+    Properties:
+      Name: TestApiKey
+      Description: CloudFormation API Key V1
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref ContactFormAPI
+          StageName: !Ref StageName
+
   ContactPOSTMethod:
     DependsOn: LambdaPOSTPermission
     Type: AWS::ApiGateway::Method
@@ -122,6 +139,7 @@ Resources:
           !GetAtt ContactFormLambda.Arn,
           "/invocations"
         ]]
+
   ContactFormLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -183,5 +201,4 @@ Resources:
             RestApiId: !Ref ContactFormAPI
       Tags:
         ApplicationName: ContactForm
-
 
