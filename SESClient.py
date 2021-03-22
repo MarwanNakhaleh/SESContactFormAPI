@@ -27,3 +27,4 @@ class SESClient:
             },
             Source=email_address,
         )
+        

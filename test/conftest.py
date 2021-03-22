@@ -19,3 +19,4 @@ def ses_client(aws_credentials):
         conn = boto3.client("ses", region_name="us-east-1")
         conn.verify_email_identity(EmailAddress="mnakhaleh@gmail.com")
         yield conn
+        
