@@ -114,7 +114,7 @@ Resources:
   ApiKey:
     Type: 'AWS::ApiGateway::ApiKey'
     DependsOn:
-      - ApiDeployment202103212021
+      - ApiDeployment202103212022
     Properties:
       Name: TestApiKey
       Description: CloudFormation API Key V1
