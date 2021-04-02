@@ -13,6 +13,9 @@ Parameters:
   StageName:
     Type: String
     Default: live
+  APIKeyValue:
+    Type: String
+    Description: API key value for the key
 
 Globals:
   Api:
@@ -100,7 +103,7 @@ Resources:
           ]
         ]
   
-  ApiDeployment202103212021:
+  ApiDeployment202103212022:
     DependsOn: ContactPOSTMethod
     Type: AWS::ApiGateway::Deployment
     Properties: 
@@ -119,6 +122,7 @@ Resources:
       StageKeys:
         - RestApiId: !Ref ContactFormAPI
           StageName: !Ref StageName
+      Value: !Ref APIKeyValue
 
   ContactPOSTMethod:
     DependsOn: LambdaPOSTPermission
@@ -128,7 +132,7 @@ Resources:
       RestApiId: !Ref ContactFormAPI
       AuthorizationType: NONE
       HttpMethod: POST
-      ApiKeyRequired: false
+      ApiKeyRequired: true
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST

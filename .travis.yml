@@ -19,7 +19,7 @@ jobs:
   - stage: deploy
     provider: script
     script:
-      # - rm -rf test/
+      - rm -rf test/
       - aws configure set aws_access_key_id $AWS_ACCESS_KEY
       - aws configure set aws_secret_access_key $AWS_SECRET_KEY
       - aws configure set default.region us-east-1
@@ -27,4 +27,4 @@ jobs:
       - sam validate
       - sam build --debug
       - sam package --s3-bucket bransonsolutions-codedeploy --output-template-file out.yaml --region us-east-1
-      - sam deploy --template-file out.yaml --stack-name ContactFormSES --region us-east-1 --no-fail-on-empty-changeset  --capabilities CAPABILITY_NAMED_IAM  
+      - sam deploy --template-file out.yaml --stack-name ContactFormSES --region us-east-1 --no-fail-on-empty-changeset  --capabilities CAPABILITY_NAMED_IAM

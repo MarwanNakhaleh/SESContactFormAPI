@@ -1,6 +1,6 @@
 import os
 import json
-from base64 import b64decode
+from base64 import b64decode, b64encode
 
 import boto3
 from botocore.exceptions import ClientError
@@ -8,8 +8,6 @@ from botocore.exceptions import ClientError
 from SESClient import SESClient
 
 def lambda_handler(event, context):
-    # print("this is the event: " + json.dumps(event))
-    # print("this is the encoded event body: " + event["body"])
     event_body = json.loads(b64decode(event["body"]))
     
     RECIPIENT = os.environ["RECIPIENT_EMAIL"]
@@ -30,18 +28,16 @@ def lambda_handler(event, context):
                     'Access-Control-Allow-Methods': '*'
                 },
                 "statusCode": 200,
-                "body": {
-                    "messageId": response["MessageId"]
-                },
+                "body": response["MessageId"],
             }
     # generic exception, though it might just be a KeyError
     except Exception as e:
-        print(e)
+        print("ERROR: " + str(e))
         {
             "headers": {
                 "Access-Control-Allow-Origin": "*",
                 'Access-Control-Allow-Methods': '*'
             },
             "statusCode": 500,
-            "body": e,
+            "body": str(e),
         }
