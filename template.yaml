@@ -16,6 +16,7 @@ Parameters:
   APIKeyValue:
     Type: String
     Description: API key value for the key
+    Default: test_key
 
 Globals:
   Api:
@@ -32,7 +33,7 @@ Resources:
       Cors:
         AllowMethods: "'POST'"
         AllowHeaders: "'X-Forwarded-For'"
-        AllowOrigin: "'*'" # TODO: lock this down
+        AllowOrigin: "'https://branson.solutions', 'https://www.branson.solutions'" # TODO: lock this down
         MaxAge: "'600'"
         AllowCredentials: False
       # TODO: Add OpenAPI definition files 
@@ -103,7 +104,7 @@ Resources:
           ]
         ]
   
-  ApiDeployment202103212021:
+  ApiDeployment202103212020:
     DependsOn: ContactPOSTMethod
     Type: AWS::ApiGateway::Deployment
     Properties: 
@@ -111,18 +112,18 @@ Resources:
       RestApiId: !Ref ContactFormAPI
       StageName: !Ref StageName
 
-  ApiKey:
-    Type: 'AWS::ApiGateway::ApiKey'
-    DependsOn:
-      - ApiDeployment202103212021
-    Properties:
-      Name: TestApiKey
-      Description: CloudFormation API Key V1
-      Enabled: true
-      StageKeys:
-        - RestApiId: !Ref ContactFormAPI
-          StageName: !Ref StageName
-      Value: !Ref APIKeyValue
+  # ApiKey:
+  #   Type: 'AWS::ApiGateway::ApiKey'
+  #   DependsOn:
+  #     - ApiDeployment202103212021
+  #   Properties:
+  #     Name: TestApiKey
+  #     Description: CloudFormation API Key V1
+  #     Enabled: true
+  #     StageKeys:
+  #       - RestApiId: !Ref ContactFormAPI
+  #         StageName: !Ref StageName
+  #     Value: !Ref APIKeyValue
 
   ContactPOSTMethod:
     DependsOn: LambdaPOSTPermission
@@ -132,7 +133,7 @@ Resources:
       RestApiId: !Ref ContactFormAPI
       AuthorizationType: NONE
       HttpMethod: POST
-      ApiKeyRequired: true
+      ApiKeyRequired: false
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
