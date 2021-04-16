@@ -21,7 +21,7 @@ Parameters:
 Globals:
   Api:
     EndpointConfiguration: EDGE
-    Cors: "'https://branson.solutions', 'https://www.branson.solutions'"
+    Cors: "https://www.branson.solutions"
 
 Resources:
   ContactFormAPI:
@@ -33,7 +33,7 @@ Resources:
       Cors:
         AllowMethods: "'POST'"
         AllowHeaders: "'X-Forwarded-For'"
-        AllowOrigin: "'https://branson.solutions', 'https://www.branson.solutions'" # TODO: lock this down
+        AllowOrigin: "https://www.branson.solutions" # TODO: lock this down
         MaxAge: "'600'"
         AllowCredentials: False
       # TODO: Add OpenAPI definition files 
@@ -104,7 +104,7 @@ Resources:
           ]
         ]
   
-  ApiDeployment202103212020:
+  ApiDeployment202103212021:
     DependsOn: ContactPOSTMethod
     Type: AWS::ApiGateway::Deployment
     Properties: 
@@ -207,3 +207,23 @@ Resources:
       Tags:
         ApplicationName: ContactForm
 
+  Authorizer:
+    Type: 'AWS::ApiGateway::Authorizer'
+    Properties:
+      AuthorizerCredentials: !GetAtt 
+        - ContactFormLambdaRole
+        - Arn
+      AuthorizerResultTtlInSeconds: 300
+      AuthorizerUri: !Join 
+        - ''
+        - - 'arn:aws:apigateway:'
+          - !Ref 'AWS::Region'
+          - ':lambda:path/2015-03-31/functions/'
+          - !GetAtt 
+            - ContactFormLambda
+            - Arn
+          - /invocations
+      Type: JWT
+      IdentitySource: method.request.header.Auth
+      Name: DefaultAuthorizer
+      RestApiId: !Ref ContactFormAPI

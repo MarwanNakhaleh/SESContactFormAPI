@@ -26,7 +26,7 @@ def lambda_handler(event, context):
         if(response["MessageId"]):
             return {
                 "headers": {
-                    "Access-Control-Allow-Origin": "'https://branson.solutions', 'https://www.branson.solutions'",
+                    "Access-Control-Allow-Origin": "https://www.branson.solutions",
                     'Access-Control-Allow-Methods': '*'
                 },
                 "statusCode": 200,
