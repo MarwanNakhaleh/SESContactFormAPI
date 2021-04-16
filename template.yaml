@@ -20,7 +20,7 @@ Parameters:
 Globals:
   Api:
     EndpointConfiguration: EDGE
-    Cors: "'*'"
+    Cors: "'https://branson.solutions', 'https://www.branson.solutions'"
 
 Resources:
   ContactFormAPI:
@@ -103,7 +103,7 @@ Resources:
           ]
         ]
   
-  ApiDeployment202103212022:
+  ApiDeployment202103212021:
     DependsOn: ContactPOSTMethod
     Type: AWS::ApiGateway::Deployment
     Properties: 
